@@ -49,6 +49,18 @@ def count_port_protocol_combinations(tagged_logs):
     port_protocol_counts = Counter((dstport, protocol) for dstport, protocol, _ in tagged_logs)
     return port_protocol_counts
 
+def write_output_file(tag_counts, port_protocol_counts, output_file):
+    with open(output_file, 'w') as file:
+        file.write("Tag Counts:\n")
+        file.write("Tag,Count\n")
+        for tag, count in tag_counts.items():
+            file.write(f"{tag},{count}\n")
+
+        file.write("\nPort/Protocol Combination Counts:\n")
+        file.write("Port,Protocol,Count\n")
+        for (dstport, protocol), count in port_protocol_counts.items():
+            file.write(f"{dstport},{protocol},{count}\n")
+
 def main():
     # Step 1: Load the lookup table
     lookup_table_path = 'lookup_table.csv'
@@ -86,6 +98,12 @@ def main():
     print("\nPort/Protocol Combination Counts:")
     for (dstport, protocol), count in port_protocol_counts.items():
         print(f"Port: {dstport}, Protocol: {protocol}, Count: {count}")
+
+    # Step 6: Write results to an output file
+    output_file = 'flow_log_analysis_output.txt'
+    write_output_file(tag_counts, port_protocol_counts, output_file)
+
+    print(f"\nResults written to {output_file}")
 
 if __name__ == "__main__":
     main()
