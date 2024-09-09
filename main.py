@@ -1,4 +1,5 @@
 import csv
+from collections import Counter
 
 def load_lookup_table(file_path):
     lookup = {}
@@ -40,6 +41,14 @@ def tag_flow_logs(flow_logs, lookup_table):
         tagged_logs.append((dstport, protocol, tag))
     return tagged_logs
 
+def count_tags(tagged_logs):
+    tag_counts = Counter(tag for _, _, tag in tagged_logs)
+    return tag_counts
+
+def count_port_protocol_combinations(tagged_logs):
+    port_protocol_counts = Counter((dstport, protocol) for dstport, protocol, _ in tagged_logs)
+    return port_protocol_counts
+
 def main():
     # Step 1: Load the lookup table
     lookup_table_path = 'lookup_table.csv'
@@ -60,10 +69,23 @@ def main():
     # Step 3: Tag the flow logs
     tagged_logs = tag_flow_logs(flow_logs, lookup_table)
 
-    # Step 4: Print tagged flow logs to verify
     print("\nTagged Flow Logs:")
     for dstport, protocol, tag in tagged_logs:
         print(f"Destination Port: {dstport}, Protocol: {protocol}, Tag: {tag}")
+
+    # Step 4: Count tags
+    tag_counts = count_tags(tagged_logs)
+
+    print("\nTag Counts:")
+    for tag, count in tag_counts.items():
+        print(f"Tag: {tag}, Count: {count}")
+
+    # Step 5: Count port/protocol combinations
+    port_protocol_counts = count_port_protocol_combinations(tagged_logs)
+
+    print("\nPort/Protocol Combination Counts:")
+    for (dstport, protocol), count in port_protocol_counts.items():
+        print(f"Port: {dstport}, Protocol: {protocol}, Count: {count}")
 
 if __name__ == "__main__":
     main()
