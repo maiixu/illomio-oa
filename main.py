@@ -33,6 +33,13 @@ def map_protocol_number(protocol_number):
     } # Map protocol numbers to names
     return protocol_map.get(protocol_number, 'unknown')
 
+def tag_flow_logs(flow_logs, lookup_table):
+    tagged_logs = []
+    for dstport, protocol in flow_logs:
+        tag = lookup_table.get((dstport, protocol), 'Untagged')
+        tagged_logs.append((dstport, protocol, tag))
+    return tagged_logs
+
 def main():
     # Step 1: Load the lookup table
     lookup_table_path = 'lookup_table.csv'
@@ -46,10 +53,17 @@ def main():
     flow_log_path = 'flow_logs.csv'
     flow_logs = parse_flow_logs(flow_log_path)
 
-    # Step 3: Print parsed flow logs to verify
     print("\nFlow Logs Parsed:")
     for dstport, protocol in flow_logs:
         print(f"Destination Port: {dstport}, Protocol: {protocol}")
+
+    # Step 3: Tag the flow logs
+    tagged_logs = tag_flow_logs(flow_logs, lookup_table)
+
+    # Step 4: Print tagged flow logs to verify
+    print("\nTagged Flow Logs:")
+    for dstport, protocol, tag in tagged_logs:
+        print(f"Destination Port: {dstport}, Protocol: {protocol}, Tag: {tag}")
 
 if __name__ == "__main__":
     main()
